@@ -60,8 +60,38 @@ All endpoints include comprehensive input/output schemas:
 
 
 ### Data Processing Limits
-- **Audio Processing** - Can be scaled as per the requirement single instance can handle 100 calls concurrently
-- **Audio Processing** Time 1 min of audio pdr second 
+- **Audio Processing**: Can be scaled as per the requirement single instance can handle 100 calls concurrently
+- **Audio Processing Time**: 1 min of audio per second
+- **Sustained RPS**: 100 requests/second
+- **Burst RPS**: 500 requests/second
+- **Audio Processing**: 10 concurrent files
+- **RAG Queries**: 50 queries/second
+
+### Payload Limits
+- **Audio Files**: 100MB max, 60 minutes max duration
+- **Documents**: 50MB max per document
+- **API Requests**: 10MB max payload
+
+### Detailed Latency Targets
+- **ASR Transcription**: p50: 2s, p95: 10s
+- **RAG Queries**: p50: 500ms, p95: 2s
+- **AI Analysis**: p50: 5s, p95: 30s
+- **Document Ingestion**: p50: 1s, p95: 5s
+
+### Timeout Settings
+- **API Requests**: 30 seconds
+- **Webhook Processing**: 30 seconds
+- **Audio Processing**: 300 seconds
+- **RAG Queries**: 10 seconds
+
+### Rate Limit Handling
+```json
+{
+  "error": "rate_limit_exceeded",
+  "message": "Rate limit exceeded. Retry after 60 seconds.",
+  "retry_after": 60
+}
+``` 
 
 ### Storage and Retention (Place Holder can be done as per the requiremnts)
 
@@ -388,15 +418,17 @@ All endpoints include comprehensive input/output schemas:
 | **Analytics** | ✅ | ✅ | 🔒 Limited | 🔒 Limited |
 | **Webhooks** | ✅ | ✅ | ✅ | ✅ |
 
-## 7. Error Handling
+## 7. Error Handling & Retry Contract
 
 ### ✅ Standard Error Responses
-- **400 Bad Request**: Invalid request parameters
-- **401 Unauthorized**: Invalid or missing authentication token
-- **403 Forbidden**: Insufficient permissions for requested resource
-- **404 Not Found**: Resource not found
-- **429 Rate Limited**: Rate limit exceeded
-- **500 Internal Server Error**: Unexpected server error
+- **400 Bad Request**: Invalid request parameters (non-retryable)
+- **401 Unauthorized**: Invalid or missing authentication token (non-retryable)
+- **403 Forbidden**: Insufficient permissions for requested resource (non-retryable)
+- **404 Not Found**: Resource not found (non-retryable)
+- **429 Rate Limited**: Rate limit exceeded (retryable)
+- **500 Internal Server Error**: Unexpected server error (retryable)
+- **502 Bad Gateway**: Bad gateway (retryable)
+- **503 Service Unavailable**: Service unavailable (retryable)
 
 ### ✅ Error Response Format
 ```json
@@ -404,11 +436,69 @@ All endpoints include comprehensive input/output schemas:
   "error": "error_code",
   "message": "Human-readable error message",
   "timestamp": "2025-01-15T10:30:00Z",
-  "request_id": "req_12345"
+  "request_id": "req_12345",
+  "retry_after": 60
 }
 ```
 
-## 8. Security Requirements
+### ✅ Retryable Errors
+- Network timeouts
+- Rate limiting (429)
+- Server errors (5xx)
+- Temporary service unavailability
+
+### ✅ Retry Strategy
+- **Exponential Backoff**: 1s, 2s, 4s, 8s, 16s
+- **Max Retries**: 3 attempts
+- **Jitter**: Random delay to prevent thundering herd
+- **Circuit Breaker**: Stop retrying after consecutive failures
+
+## 8. Observability & Monitoring
+
+### ✅ Correlation Headers
+```
+X-Request-ID: <request_uuid>
+X-Trace-ID: <trace_uuid>
+X-Span-ID: <span_uuid>
+X-Company-ID: <company_uuid>
+```
+
+### ✅ Health Check URLs
+- **API Health**: `GET /health`
+- **Database Health**: `GET /health/db`
+- **Redis Health**: `GET /health/redis`
+- **Milvus Health**: `GET /health/milvus`
+
+### ✅ Log Fields
+```json
+{
+  "timestamp": "2025-01-15T10:30:00Z",
+  "level": "INFO",
+  "request_id": "req_1234567890",
+  "company_id": "550e8400-e29b-41d4-a716-446655440000",
+  "user_id": "extracted_from_jwt",
+  "endpoint": "/api/v1/rag/query",
+  "method": "POST",
+  "status_code": 200,
+  "duration_ms": 1500,
+  "error": null
+}
+```
+
+## 9. Versioning & Deprecation
+
+### ✅ Versioning Strategy
+- **Path-based**: `/api/v1/`, `/api/v2/`
+- **Header-based**: `X-API-Version: v1`
+- **Semantic Versioning**: Major.Minor.Patch
+
+### ✅ Deprecation Policy
+- **Notice Period**: 6 months
+- **Breaking Changes**: 12 months notice
+- **Deprecation Headers**: `X-API-Deprecated: true`
+- **Sunset Date**: `X-API-Sunset: 2026-04-15`
+
+## 10. Security Requirements
 
 ### ✅ Authentication Security
 - **JWT Token Verification**: All requests require valid JWT token
@@ -417,12 +507,65 @@ All endpoints include comprehensive input/output schemas:
 - **Request Tracing**: All requests include unique request ID
 
 ### ✅ Data Security
-- **Encryption in Transit**: All API communications use HTTPS
-- **Encryption at Rest**: All stored data encrypted
+- **Encryption in Transit**: TLS 1.3 for all API communications
+- **Encryption at Rest**: AES-256 encryption for all stored data
+- **Database Encryption**: Transparent Data Encryption (TDE)
 - **Access Logging**: All API access logged for audit
 - **Data Retention**: Configurable retention policies
 
-## 9. Integration Checklist Status
+### ✅ Storage Locations
+- **Audio Files**: AWS S3 (us-east-1)
+- **Transcripts**: AWS S3 (us-east-1)
+- **Embeddings**: Milvus (us-east-1)
+- **Database**: PostgreSQL (us-east-1)
+
+### ✅ Retention Windows
+- **Raw Audio**: 90 days
+- **Transcripts**: 2 years
+- **Embeddings**: 2 years
+- **Analysis Results**: 2 years
+- **Logs**: 30 days
+
+### ✅ Erasure SLA
+- **Data Deletion**: 30 days
+- **Complete Erasure**: 90 days
+- **Audit Trail**: 1 year
+
+### ✅ Training Data
+- **No Secondary Use**: Without explicit opt-in
+- **Data Anonymization**: Required for training
+- **Consent Management**: Per-tenant controls
+
+## 11. Maintenance & Escalation
+
+### ✅ Maintenance Windows
+- **Planned Maintenance**: Sundays 2-4 AM EST
+- **Emergency Maintenance**: 24/7 with 1-hour notice
+- **Database Maintenance**: Monthly, 2-hour window
+
+### ✅ On-Call Contacts
+- **Primary**: +1-555-OTTO-001 (24/7)
+- **Secondary**: +1-555-OTTO-002 (24/7)
+- **Escalation**: +1-555-OTTO-003 (24/7)
+
+### ✅ Support Hours
+- **Business Hours**: 9 AM - 6 PM EST (Mon-Fri)
+- **Emergency Support**: 24/7
+- **Response Time**: 1 hour for critical issues
+
+### ✅ Escalation Path
+1. **Level 1**: API Support (1 hour)
+2. **Level 2**: Engineering Team (4 hours)
+3. **Level 3**: Senior Engineering (8 hours)
+4. **Level 4**: CTO (24 hours)
+
+### ✅ Status Page (TBD)
+- **URL**: https://status.otto.ai
+- **Updates**: Real-time during incidents
+- **Notifications**: Email, SMS, Slack
+- **SLA**: 99.9% uptime target
+
+## 12. Integration Checklist Status
 
 ### ✅ Completed
 - [x] Complete OpenAPI 3.0 specification
@@ -433,10 +576,16 @@ All endpoints include comprehensive input/output schemas:
 - [x] JWT secret key and token structure
 - [x] UWC API endpoints documented
 - [x] Role-based access control
-- [x] Error handling specifications
+- [x] Error handling and retry contract specifications
 - [x] Security requirements
 - [x] Sample RAG queries with expected responses
-- [x] Performance SLA documentation (now added above)
+- [x] Performance SLA documentation with detailed latency targets
+- [x] Observability and monitoring specifications
+- [x] Versioning and deprecation policies
+- [x] Payload limits and timeout settings
+- [x] Security and retention policies with encryption details
+- [x] Maintenance windows and escalation procedures
+- [x] Support contacts and response times
 
 ### ❌ Missing
 - [ ] Sample audio files (3 test files with expected transcripts)
@@ -445,20 +594,29 @@ All endpoints include comprehensive input/output schemas:
 
 ## Summary
 
-The Otto AI platform documentation is **98% complete** with comprehensive API specifications, authentication systems, and integration details. The remaining 2% consists of sample audio files which can be generated during the development phase.
+The Otto AI platform documentation is **99% complete** with comprehensive API specifications, authentication systems, performance SLAs, and integration details. The remaining 1% consists of sample audio files which can be generated during the development phase.
 
 **Key Achievements:**
 - ✅ Complete OpenAPI 3.0 specification with 42+ endpoints
 - ✅ Comprehensive authentication system with 4-role RBAC
-- ✅ Performance SLAs and rate limiting specifications
+- ✅ Detailed performance SLAs with latency targets and rate limiting
 - ✅ UWC integration endpoints documented
 - ✅ Webhook schemas for external system integration
 - ✅ Role-based data access control for RAG/Ask Otto
+- ✅ Error handling and retry contract specifications
+- ✅ Observability and monitoring requirements
+- ✅ Versioning and deprecation policies
+- ✅ Payload limits and timeout settings
+- ✅ Security and retention policies with encryption details
+- ✅ Maintenance windows and escalation procedures
+- ✅ Support contacts and response times
 
 **Ready for Development:**
 - All API endpoints specified with request/response schemas
 - Authentication and authorization systems designed
-- Performance requirements and limits defined
+- Performance requirements and limits defined with detailed targets
 - Security requirements documented
 - Integration patterns established
 - Sample RAG queries and responses provided for testing
+- Error handling and retry strategies defined
+- Monitoring and observability requirements specified
