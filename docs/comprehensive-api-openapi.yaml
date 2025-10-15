@@ -1,0 +1,2919 @@
+openapi: 3.0.3
+info:
+  title: Otto AI Comprehensive API
+  description: |
+    Comprehensive API design for the Otto AI platform, including detailed input/output parameters for all 42+ endpoints across 13 functional categories. 
+    The API supports AI-powered sales intelligence with voice processing, RAG capabilities, personal AI clones, and comprehensive analytics.
+  version: 1.0.0
+  contact:
+    name: Otto AI API Support
+    email: api-support@otto.ai
+  license:
+    name: Proprietary
+    url: https://otto.ai/license
+
+servers:
+  - url: https://rag-api.otto.ai
+    description: Production server
+  - url: https://otto-dev.shunyalabs.ai
+    description: Staging server
+  - url: http://localhost:8000
+    description: Local development server
+
+security:
+  - BearerAuth: []
+  - CompanyAuth: []
+
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health Check
+      description: Check API health status
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: API is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls:
+    post:
+      tags:
+        - Call Data Ingestion
+      summary: Create Call Record
+      description: Create a new call record for processing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallRecord'
+      responses:
+        '201':
+          description: Call record created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}:
+    get:
+      tags:
+        - Call Data Ingestion
+      summary: Get Call Details
+      description: Retrieve call details by ID
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Call details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Call Data Ingestion
+      summary: Update Call Metadata
+      description: Update call metadata and status
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallUpdateRequest'
+      responses:
+        '200':
+          description: Call updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/status:
+    get:
+      tags:
+        - Call Data Ingestion
+      summary: Get Call Processing Status
+      description: Get detailed processing status for a call
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Processing status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallStatusResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/audio:
+    get:
+      tags:
+        - Call Data Ingestion
+      summary: Get Audio Playback URL
+      description: Get signed URL for audio playback
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Audio URL retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioPlaybackResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/transcript:
+    get:
+      tags:
+        - Call Data Ingestion
+      summary: Get Transcript
+      description: Get transcript content from S3
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Transcript retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranscriptResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/diarization:
+    get:
+      tags:
+        - Call Data Ingestion
+      summary: Get Speaker Diarization
+      description: Get speaker diarization results
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Speaker diarization retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiarizationResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/ingestion/sop-documents:
+    post:
+      tags:
+        - Document Data Ingestion
+      summary: Ingest SOP Documents
+      description: Ingest Standard Operating Procedure documents for role-based training
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                company_id:
+                  type: string
+                  format: uuid
+                role:
+                  type: string
+                  example: "sales_rep"
+                document_type:
+                  type: string
+                  example: "sop"
+                file:
+                  type: string
+                  format: binary
+                metadata:
+                  type: object
+                  properties:
+                    version:
+                      type: string
+                      example: "v2.1"
+                    effective_date:
+                      type: string
+                      format: date
+                      example: "2025-01-15"
+                    department:
+                      type: string
+                      example: "sales"
+      responses:
+        '201':
+          description: SOP document ingestion started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SOPIngestionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/ingestion/documents/upload:
+    post:
+      tags:
+        - Document Data Ingestion
+      summary: Document Upload (UWC)
+      description: Upload documents for processing (UWC - Underwater Computing)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadRequest'
+      responses:
+        '201':
+          description: Document upload initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentUploadResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/ingestion/documents/complete:
+    post:
+      tags:
+        - Document Data Ingestion
+      summary: Document Processing Complete (UWC)
+      description: Mark document processing as complete (UWC callback)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentCompleteRequest'
+      responses:
+        '200':
+          description: Processing completion acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentCompleteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/ingestion/training-documents:
+    post:
+      tags:
+        - Document Data Ingestion
+      summary: Ingest Training Materials
+      description: Ingest training materials and knowledge base documents
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                company_id:
+                  type: string
+                  format: uuid
+                document_type:
+                  type: string
+                  example: "training"
+                file:
+                  type: string
+                  format: binary
+                metadata:
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                      example: "product_knowledge"
+                    audience:
+                      type: string
+                      example: "sales_team"
+                    difficulty_level:
+                      type: string
+                      example: "intermediate"
+      responses:
+        '201':
+          description: Training document ingestion started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingIngestionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/ingestion/reference-documents:
+    post:
+      tags:
+        - Document Data Ingestion
+      summary: Ingest Reference Documents
+      description: Ingest reference materials and company-specific documentation
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                company_id:
+                  type: string
+                  format: uuid
+                document_type:
+                  type: string
+                  example: "reference"
+                file:
+                  type: string
+                  format: binary
+                metadata:
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                      example: "company_policies"
+                    access_level:
+                      type: string
+                      example: "internal"
+                    last_updated:
+                      type: string
+                      format: date
+                      example: "2025-01-10"
+      responses:
+        '201':
+          description: Reference document ingestion started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferenceIngestionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/asr/transcribe:
+    post:
+      tags:
+        - Voice Intelligence
+      summary: Batch Audio Transcription
+      description: Transcribe audio using ASR services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranscriptionRequest'
+      responses:
+        '200':
+          description: Transcription completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranscriptionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/speakers:
+    get:
+      tags:
+        - Voice Intelligence
+      summary: Get Speaker Segments
+      description: Get speaker diarization segments
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Speaker segments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiarizationResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/lead-classification:
+    get:
+      tags:
+        - Voice Intelligence
+      summary: Get Lead Classification
+      description: Get AI-powered lead classification results
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Lead classification retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadClassificationResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/objections:
+    get:
+      tags:
+        - Voice Intelligence
+      summary: Get Objection Analysis
+      description: Get detected objections and response suggestions
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Objection analysis retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectionAnalysisResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/sop-analysis:
+    get:
+      tags:
+        - Voice Intelligence
+      summary: Get SOP Analysis
+      description: Get SOP compliance analysis
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: SOP analysis retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SOPAnalysisResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/coaching:
+    get:
+      tags:
+        - Voice Intelligence
+      summary: Get Coaching Feedback
+      description: Get real-time coaching feedback
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Coaching feedback retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachingResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/meeting-segments:
+    get:
+      tags:
+        - Voice Intelligence
+      summary: Get Meeting Segmentation
+      description: Get meeting phase segmentation
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Meeting segments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetingSegmentsResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/calls/{call_id}/rehash-score:
+    get:
+      tags:
+        - Voice Intelligence
+      summary: Get Rehash Score
+      description: Get rehash scoring for follow-up prioritization
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Rehash score retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RehashScoreResponse'
+        '404':
+          description: Call not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/rag/queries:
+    get:
+      tags:
+        - RAG/Ask Otto
+      summary: Get Query History
+      description: Retrieve query history with pagination
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of results to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of results to skip
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [created_at, query_text]
+            default: created_at
+          description: Sort order
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search in query text
+      responses:
+        '200':
+          description: Query history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryHistoryResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /api/v1/clone/{rep_id}/profile:
+    get:
+      tags:
+        - Personal AI
+      summary: Get Clone Profile
+      description: Retrieve clone profile and characteristics
+      parameters:
+        - name: rep_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Representative identifier
+      responses:
+        '200':
+          description: Clone profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloneProfileResponse'
+        '404':
+          description: Clone not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/clone/{rep_id}/generate:
+    post:
+      tags:
+        - Personal AI
+      summary: Generate Content with Personal Clone
+      description: Generate content using personal AI clone
+      parameters:
+        - name: rep_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Sales rep identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloneGenerateRequest'
+      responses:
+        '200':
+          description: Content generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloneGenerateResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/clone/{rep_id}/drafts:
+    get:
+      tags:
+        - Personal AI
+      summary: Get Generated Drafts
+      description: Retrieve generated content drafts
+      parameters:
+        - name: rep_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Sales rep identifier
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [created_at, content_type]
+            default: created_at
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: content_type
+          in: query
+          schema:
+            type: string
+            enum: [email, sms, call_script]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ready, draft, sent]
+      responses:
+        '200':
+          description: Drafts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloneDraftsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/clone/{rep_id}/train:
+    post:
+      tags:
+        - Personal AI
+      summary: Train Personal Clone
+      description: Train personal AI clone with communication samples
+      parameters:
+        - name: rep_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Sales rep identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloneTrainRequest'
+      responses:
+        '200':
+          description: Training started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloneTrainResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/clone/{rep_id}/status:
+    get:
+      tags:
+        - Personal AI
+      summary: Get Clone Training Status
+      description: Check personal clone training status
+      parameters:
+        - name: rep_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Sales rep identifier
+      responses:
+        '200':
+          description: Training status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloneStatusResponse'
+        '404':
+          description: Clone not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # WebSocket endpoint for RAG/Ask Otto real-time chat
+  /api/v1/rag/query:
+    get:
+      tags:
+        - RAG/Ask Otto
+      summary: Natural Language Query (WebSocket)
+      description: |
+        Real-time interactive chat with Ask Otto using WebSocket connection.
+        
+        **WebSocket Connection:**
+        ```javascript
+        const ws = new WebSocket('wss://api.otto.ai/api/v1/rag/query', {
+          headers: {
+            'Authorization': 'Bearer <jwt_token>',
+            'X-Company-ID': '<company_uuid>',
+            'X-Request-ID': '<request_uuid>'
+          }
+        });
+        ```
+        
+        **WebSocket Message Types:**
+        
+        **Client → Server Messages:**
+        - `connect`: Initial connection with user context
+        - `query`: Send natural language query
+        - `follow_up`: Follow-up question with context
+        - `disconnect`: End session
+        
+        **Server → Client Messages:**
+        - `connected`: Connection established
+        - `processing`: Query processing started
+        - `response_chunk`: Streaming response chunks
+        - `response_complete`: Final response with citations
+        - `error`: Error handling
+        - `timeout`: Session timeout warning
+        
+        **Features:**
+        - Real-time streaming responses
+        - Session management with conversation context
+        - Follow-up questions with context retention
+        - Suggested follow-ups from AI
+        - Error handling with suggestions
+        - Session timeout and cleanup
+        - Connection management with heartbeat
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Bearer JWT token
+        - name: X-Company-ID
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Company UUID for multi-tenant isolation
+        - name: X-Request-ID
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Request UUID for tracing
+      responses:
+        '101':
+          description: Switching Protocols - WebSocket connection established
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/summary/daily:
+    post:
+      tags:
+        - Enhanced Summarization
+      summary: Generate Daily Summary
+      description: Generate daily performance recap
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailySummaryRequest'
+      responses:
+        '200':
+          description: Daily summary generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailySummaryResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/summary/appointment:
+    post:
+      tags:
+        - Enhanced Summarization
+      summary: Generate Appointment Summary
+      description: Generate appointment-specific summary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentSummaryRequest'
+      responses:
+        '200':
+          description: Appointment summary generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentSummaryResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/summary/prep:
+    post:
+      tags:
+        - Enhanced Summarization
+      summary: Generate Prep Summary
+      description: Generate pre-call summary with context and insights
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrepSummaryRequest'
+      responses:
+        '200':
+          description: Prep summary generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepSummaryResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/summary/{rep_id}/history:
+    get:
+      tags:
+        - Enhanced Summarization
+      summary: Get Summary History
+      description: Retrieve summary history by representative
+      parameters:
+        - name: rep_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Representative identifier
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [daily, appointment, prep]
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [created_at, date]
+            default: created_at
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Summary history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SummaryHistoryResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/summary/call/{call_id}:
+    get:
+      tags:
+        - Enhanced Summarization
+      summary: Get Summary by Call ID
+      description: Retrieve summary for a specific call
+      parameters:
+        - name: call_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Call identifier
+      responses:
+        '200':
+          description: Summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallSummaryResponse'
+        '404':
+          description: Summary not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/analytics/performance/{company_id}:
+    get:
+      tags:
+        - Performance & Analytics
+      summary: Get Performance Metrics
+      description: Get company-wide performance metrics
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Company identifier
+        - name: date_range
+          in: query
+          schema:
+            type: string
+          description: Optional date range filter
+      responses:
+        '200':
+          description: Performance metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceMetricsResponse'
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/analytics/reps/{company_id}:
+    get:
+      tags:
+        - Performance & Analytics
+      summary: Get Rep Performance
+      description: Get individual rep performance data
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Company identifier
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [performance_score, calls_handled, conversion_rate]
+            default: performance_score
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: min_performance_score
+          in: query
+          schema:
+            type: number
+            format: float
+        - name: date_range
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rep performance data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepPerformanceResponse'
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/analytics/objections/{company_id}:
+    get:
+      tags:
+        - Performance & Analytics
+      summary: Get Objection Analytics
+      description: Get objection frequency and impact analysis
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Company identifier
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [frequency, impact_score, objection_type]
+            default: frequency
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: min_frequency
+          in: query
+          schema:
+            type: integer
+        - name: date_range
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Objection analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectionAnalyticsResponse'
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/analytics/leads/{company_id}:
+    get:
+      tags:
+        - Performance & Analytics
+      summary: Get Lead Analytics
+      description: Get lead quality and source analytics
+      parameters:
+        - name: company_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Company identifier
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [quality_score, source, created_at]
+            default: quality_score
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: quality_filter
+          in: query
+          schema:
+            type: string
+            enum: [hot, warm, cold]
+        - name: source_filter
+          in: query
+          schema:
+            type: string
+        - name: date_range
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lead analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadAnalyticsResponse'
+        '404':
+          description: Company not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/callrail/call-completed:
+    post:
+      tags:
+        - Webhooks
+      summary: CallRail Call Completed
+      description: Handle CallRail webhook for completed calls
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallRailWebhookRequest'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/callrail/call-started:
+    post:
+      tags:
+        - Webhooks
+      summary: CallRail Call Started
+      description: Handle CallRail webhook for started calls
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallRailWebhookRequest'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/callrail/recording-ready:
+    post:
+      tags:
+        - Webhooks
+      summary: CallRail Recording Ready
+      description: Handle CallRail webhook for recording availability
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallRailWebhookRequest'
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token containing user info (user_id, role, permissions)
+    CompanyAuth:
+      type: apiKey
+      in: header
+      name: X-Company-ID
+      description: Required for multi-tenant isolation
+    RequestIdAuth:
+      type: apiKey
+      in: header
+      name: X-Request-ID
+      description: Required for tracing and debugging
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "healthy"
+        service:
+          type: string
+          example: "otto-api"
+        version:
+          type: string
+          example: "1.0.0"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "bad_request"
+        message:
+          type: string
+          example: "Invalid request parameters"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+        retry_after:
+          type: integer
+          description: Seconds to wait before retrying (for rate limit errors)
+          example: 60
+
+    CallRecord:
+      type: object
+      required:
+        - company_id
+        - call_id
+        - audio_url
+        - caller_phone
+        - rep_phone
+        - duration
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        call_id:
+          type: string
+          example: "call_12345"
+        audio_url:
+          type: string
+          format: uri
+          example: "https://s3.amazonaws.com/bucket/audio.wav"
+        caller_phone:
+          type: string
+          example: "+1234567890"
+        rep_phone:
+          type: string
+          example: "+0987654321"
+        duration:
+          type: integer
+          example: 300
+        callrail_id:
+          type: string
+          example: "cr_12345"
+        metadata:
+          type: object
+          properties:
+            source:
+              type: string
+              example: "callrail"
+            campaign:
+              type: string
+              example: "summer_sale"
+
+    CallResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        company_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+          example: "pending"
+        audio_file_path:
+          type: string
+          example: "s3://bucket/audio/call_12345.wav"
+        transcript_file_path:
+          type: string
+          nullable: true
+          example: null
+        speaker_diarization_file_path:
+          type: string
+          nullable: true
+          example: null
+        processing_status:
+          type: string
+          enum: [pending, processing, completed, failed]
+          example: "pending"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+
+    CallStatusResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        status:
+          type: string
+          example: "processing"
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 75
+        stages:
+          type: object
+          properties:
+            transcription:
+              type: string
+              example: "completed"
+            diarization:
+              type: string
+              example: "processing"
+            analysis:
+              type: string
+              example: "pending"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:32:00Z"
+
+    AudioPlaybackResponse:
+      type: object
+      properties:
+        audio_url:
+          type: string
+          format: uri
+          example: "https://s3.amazonaws.com/bucket/audio/call_12345.wav?X-Amz-Signature=..."
+        expires_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T11:30:00Z"
+
+    TranscriptResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        transcript:
+          type: string
+          example: "Hello, this is John from ABC Company. I'm calling about your recent inquiry..."
+        confidence:
+          type: number
+          format: float
+          example: 0.95
+        language:
+          type: string
+          example: "en-US"
+
+    SpeakerSegment:
+      type: object
+      properties:
+        speaker_id:
+          type: string
+          example: "speaker_1"
+        start_time:
+          type: number
+          format: float
+          example: 0.0
+        end_time:
+          type: number
+          format: float
+          example: 15.5
+        text:
+          type: string
+          example: "Hello, this is John from ABC Company."
+        confidence:
+          type: number
+          format: float
+          example: 0.92
+
+    DiarizationResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        speakers:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpeakerSegment'
+
+    CallUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+          example: "processing"
+        metadata:
+          type: object
+          properties:
+            notes:
+              type: string
+              example: "High priority lead"
+            tags:
+              type: array
+              items:
+                type: string
+              example: ["qualified", "follow_up_needed"]
+
+    PaginationParams:
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: Number of results to return
+        offset:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Number of results to skip
+        sort:
+          type: string
+          description: Field to sort by
+        order:
+          type: string
+          enum: [asc, desc]
+          default: desc
+          description: Sort direction
+
+    PaginatedResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        limit:
+          type: integer
+          description: Number of items per page
+        offset:
+          type: integer
+          description: Number of items skipped
+
+    # Document Ingestion Schemas
+    SOPIngestionResponse:
+      type: object
+      properties:
+        ingestion_id:
+          type: string
+          example: "ingest_12345"
+        status:
+          type: string
+          example: "processing"
+        document_id:
+          type: string
+          example: "doc_12345"
+        chunks_created:
+          type: integer
+          example: 0
+        estimated_processing_time:
+          type: string
+          example: "2-5 minutes"
+
+    DocumentUploadRequest:
+      type: object
+      required:
+        - company_id
+        - document_name
+        - document_type
+        - url
+        - namespace
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        document_name:
+          type: string
+          example: "policy.pdf"
+        document_type:
+          type: string
+          example: "pdf"
+        url:
+          type: string
+          format: uri
+          example: "https://s3.amazonaws.com/bucket/policy.pdf"
+        namespace:
+          type: string
+          example: "company_xyz"
+        metadata:
+          type: object
+          properties:
+            category:
+              type: string
+              example: "policies"
+            access_level:
+              type: string
+              example: "internal"
+
+    DocumentUploadResponse:
+      type: object
+      properties:
+        upload_id:
+          type: string
+          example: "upload_12345"
+        status:
+          type: string
+          example: "uploaded"
+        processing_job_id:
+          type: string
+          example: "job_12345"
+        estimated_completion:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:35:00Z"
+
+    DocumentCompleteRequest:
+      type: object
+      required:
+        - upload_id
+        - processing_job_id
+        - status
+      properties:
+        upload_id:
+          type: string
+          example: "upload_12345"
+        processing_job_id:
+          type: string
+          example: "job_12345"
+        status:
+          type: string
+          example: "completed"
+        chunks_created:
+          type: integer
+          example: 25
+        vector_embeddings:
+          type: integer
+          example: 25
+        metadata_extracted:
+          type: object
+          properties:
+            title:
+              type: string
+              example: "Company Policy Document"
+            pages:
+              type: integer
+              example: 15
+            language:
+              type: string
+              example: "en"
+
+    DocumentCompleteResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "acknowledged"
+        document_id:
+          type: string
+          example: "doc_12345"
+        indexing_status:
+          type: string
+          example: "completed"
+
+    TrainingIngestionResponse:
+      type: object
+      properties:
+        ingestion_id:
+          type: string
+          example: "ingest_12346"
+        status:
+          type: string
+          example: "processing"
+        document_id:
+          type: string
+          example: "doc_12346"
+        chunks_created:
+          type: integer
+          example: 0
+        processing_notes:
+          type: string
+          example: "Document will be indexed for RAG queries"
+
+    ReferenceIngestionResponse:
+      type: object
+      properties:
+        ingestion_id:
+          type: string
+          example: "ingest_12347"
+        status:
+          type: string
+          example: "processing"
+        document_id:
+          type: string
+          example: "doc_12347"
+        chunks_created:
+          type: integer
+          example: 0
+        indexing_status:
+          type: string
+          example: "in_progress"
+
+    # Voice Intelligence Schemas
+    TranscriptionRequest:
+      type: object
+      required:
+        - audio_url
+      properties:
+        audio_url:
+          type: string
+          format: uri
+          example: "https://s3.amazonaws.com/bucket/audio.wav"
+        language:
+          type: string
+          example: "en-US"
+        model:
+          type: string
+          example: "nova-2"
+
+    TranscriptionResponse:
+      type: object
+      properties:
+        transcript:
+          type: string
+          example: "Hello, this is John from ABC Company. I'm calling about your recent inquiry..."
+        confidence:
+          type: number
+          format: float
+          example: 0.95
+        language:
+          type: string
+          example: "en-US"
+        duration:
+          type: number
+          format: float
+          example: 300.5
+
+    LeadClassificationResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        lead_score:
+          type: number
+          format: float
+          example: 0.85
+        lead_status:
+          type: string
+          enum: [hot, warm, cold]
+          example: "hot"
+        qualification_reasons:
+          type: array
+          items:
+            type: string
+          example: ["Expressed immediate need", "Budget confirmed", "Decision maker identified"]
+        confidence_score:
+          type: number
+          format: float
+          example: 0.92
+
+    ObjectionItem:
+      type: object
+      properties:
+        objection_type:
+          type: string
+          example: "price"
+        objection_text:
+          type: string
+          example: "Your price is too high compared to competitors"
+        response_suggestions:
+          type: array
+          items:
+            type: string
+          example: ["Focus on value proposition", "Offer payment plans", "Compare ROI with competitors"]
+        severity:
+          type: string
+          enum: [low, medium, high]
+          example: "high"
+        confidence:
+          type: number
+          format: float
+          example: 0.88
+
+    ObjectionAnalysisResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        objections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectionItem'
+
+    SOPStage:
+      type: object
+      properties:
+        stage_name:
+          type: string
+          example: "Introduction"
+        stage_order:
+          type: integer
+          example: 1
+        detected_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:15Z"
+        confidence_score:
+          type: number
+          format: float
+          example: 0.95
+
+    SOPAnalysisResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        stages_detected:
+          type: array
+          items:
+            $ref: '#/components/schemas/SOPStage'
+        gaps:
+          type: array
+          items:
+            type: string
+          example: ["Missing qualification questions", "No objection handling"]
+        compliance_score:
+          type: number
+          format: float
+          example: 0.75
+
+    CoachingItem:
+      type: object
+      properties:
+        feedback_type:
+          type: string
+          example: "rapport_building"
+        feedback_text:
+          type: string
+          example: "Good job building rapport in the first 2 minutes"
+        improvement_suggestions:
+          type: array
+          items:
+            type: string
+          example: ["Ask more open-ended questions", "Listen actively to responses"]
+        priority:
+          type: string
+          enum: [low, medium, high]
+          example: "medium"
+
+    CoachingResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        feedback:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoachingItem'
+
+    MeetingSegment:
+      type: object
+      properties:
+        segment_type:
+          type: string
+          example: "rapport"
+        start_time:
+          type: number
+          format: float
+          example: 0.0
+        end_time:
+          type: number
+          format: float
+          example: 120.0
+        duration:
+          type: number
+          format: float
+          example: 120.0
+        key_points:
+          type: array
+          items:
+            type: string
+          example: ["Established personal connection", "Discussed weather and local events"]
+
+    MeetingSegmentsResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeetingSegment'
+
+    RehashScoreResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        rehash_score:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+        confidence:
+          type: number
+          format: float
+          example: 0.85
+        reasons:
+          type: array
+          items:
+            type: string
+          example: ["High engagement level", "Specific next steps discussed", "Budget and timeline confirmed"]
+
+    # RAG/Ask Otto Schemas
+    QueryHistoryResponse:
+      type: object
+      properties:
+        queries:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueryItem'
+        total:
+          type: integer
+          example: 150
+        limit:
+          type: integer
+          example: 20
+        offset:
+          type: integer
+          example: 0
+
+    QueryItem:
+      type: object
+      properties:
+        query_id:
+          type: string
+          example: "query_67890"
+        query_text:
+          type: string
+          example: "What were the top objections from last week's calls?"
+        response_text:
+          type: string
+          example: "Based on last week's calls, the top objections were..."
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+
+
+    # Personal AI Schemas
+    CloneProfileResponse:
+      type: object
+      properties:
+        rep_id:
+          type: string
+          example: "rep_12345"
+        profile:
+          $ref: '#/components/schemas/CloneProfile'
+
+    CloneProfile:
+      type: object
+      properties:
+        clone_id:
+          type: string
+          example: "clone_12345"
+        is_trained:
+          type: boolean
+          example: true
+        training_status:
+          type: string
+          example: "completed"
+        model_version:
+          type: string
+          example: "v1.2.3"
+        characteristics:
+          $ref: '#/components/schemas/CloneCharacteristics'
+        performance_metrics:
+          $ref: '#/components/schemas/ClonePerformanceMetrics'
+        last_trained:
+          type: string
+          format: date-time
+          example: "2025-01-15T09:00:00Z"
+
+    CloneCharacteristics:
+      type: object
+      properties:
+        tone:
+          type: string
+          example: "professional_friendly"
+        writing_style:
+          type: string
+          example: "concise_direct"
+        communication_preferences:
+          type: array
+          items:
+            type: string
+          example: ["email", "sms"]
+
+    ClonePerformanceMetrics:
+      type: object
+      properties:
+        drafts_generated:
+          type: integer
+          example: 150
+        approval_rate:
+          type: number
+          format: float
+          example: 0.85
+        user_satisfaction:
+          type: number
+          format: float
+          example: 0.92
+
+    CloneGenerateRequest:
+      type: object
+      required:
+        - content_type
+        - prompt
+      properties:
+        content_type:
+          type: string
+          enum: [email, sms, call_script]
+          example: "email"
+        prompt:
+          type: string
+          example: "Write a follow-up email for a qualified lead who showed interest in our premium package"
+        context:
+          type: object
+          properties:
+            customer_name:
+              type: string
+              example: "John Smith"
+            company:
+              type: string
+              example: "ABC Corp"
+            previous_interaction:
+              type: string
+              example: "Initial discovery call"
+
+    CloneGenerateResponse:
+      type: object
+      properties:
+        content:
+          type: string
+          example: "Hi John,\n\nThank you for taking the time to speak with me yesterday about your company's needs. I was impressed by your insights into the challenges ABC Corp is facing..."
+        confidence:
+          type: number
+          format: float
+          example: 0.92
+        draft_id:
+          type: string
+          example: "draft_12345"
+
+    CloneDraftsResponse:
+      type: object
+      properties:
+        drafts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CloneDraft'
+
+    CloneDraft:
+      type: object
+      properties:
+        draft_id:
+          type: string
+          example: "draft_12345"
+        content_type:
+          type: string
+          example: "email"
+        content:
+          type: string
+          example: "Hi John,\n\nThank you for taking the time..."
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+        status:
+          type: string
+          example: "ready"
+
+    CloneTrainRequest:
+      type: object
+      required:
+        - communication_samples
+      properties:
+        communication_samples:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunicationSample'
+
+    CommunicationSample:
+      type: object
+      required:
+        - content
+        - type
+      properties:
+        content:
+          type: string
+          example: "Hi there! Thanks for your interest in our services..."
+        type:
+          type: string
+          enum: [email, call_transcript]
+          example: "email"
+
+    CloneTrainResponse:
+      type: object
+      properties:
+        training_id:
+          type: string
+          example: "training_12345"
+        status:
+          type: string
+          example: "started"
+
+    CloneStatusResponse:
+      type: object
+      properties:
+        rep_id:
+          type: string
+          example: "rep_12345"
+        is_trained:
+          type: boolean
+          example: true
+        training_status:
+          type: string
+          example: "completed"
+        last_trained:
+          type: string
+          format: date-time
+          example: "2025-01-15T09:00:00Z"
+        model_version:
+          type: string
+          example: "v1.2.3"
+
+    # Enhanced Summarization Schemas
+    DailySummaryRequest:
+      type: object
+      required:
+        - date
+        - rep_id
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2025-01-15"
+        rep_id:
+          type: string
+          example: "rep_12345"
+        summary_type:
+          type: string
+          enum: [detailed, brief]
+          example: "detailed"
+
+    DailySummaryResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2025-01-15"
+        rep_id:
+          type: string
+          example: "rep_12345"
+        content:
+          type: string
+          example: "Today's Performance Summary:\n\n• 5 calls completed\n• 3 qualified leads identified..."
+        metrics:
+          type: object
+          properties:
+            calls_completed:
+              type: integer
+              example: 5
+            qualified_leads:
+              type: integer
+              example: 3
+            appointments_scheduled:
+              type: integer
+              example: 2
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T18:00:00Z"
+
+    AppointmentSummaryRequest:
+      type: object
+      required:
+        - call_id
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        summary_type:
+          type: string
+          enum: [detailed, brief]
+          example: "detailed"
+
+    AppointmentSummaryResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        rep_id:
+          type: string
+          example: "rep_12345"
+        content:
+          type: string
+          example: "Appointment Summary:\n\nCustomer: John Smith (ABC Corp)\nDuration: 45 minutes\nOutcome: Qualified lead - interested in premium package..."
+        key_points:
+          type: array
+          items:
+            type: string
+          example: ["Qualified lead with budget confirmed", "Technical demo scheduled"]
+        next_steps:
+          type: array
+          items:
+            type: string
+          example: ["Send detailed proposal", "Schedule technical demo"]
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+
+    PrepSummaryRequest:
+      type: object
+      required:
+        - call_id
+        - rep_id
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        rep_id:
+          type: string
+          example: "rep_12345"
+        customer_context:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "John Smith"
+            company:
+              type: string
+              example: "ABC Corp"
+            previous_interactions:
+              type: integer
+              example: 2
+            last_objection:
+              type: string
+              example: "price_concern"
+
+    PrepSummaryResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        rep_id:
+          type: string
+          example: "rep_12345"
+        content:
+          type: string
+          example: "Pre-Call Brief for John Smith (ABC Corp):\n\nPrevious Interactions:\n• Last call: Price objection raised..."
+        key_insights:
+          type: array
+          items:
+            type: string
+          example: ["Price-sensitive customer", "Interested in premium features", "Decision maker identified"]
+        suggested_approach:
+          type: string
+          example: "Value-focused presentation with flexible payment options"
+
+    SummaryHistoryResponse:
+      type: object
+      properties:
+        rep_id:
+          type: string
+          example: "rep_12345"
+        summaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/SummaryItem'
+        total:
+          type: integer
+          example: 150
+        limit:
+          type: integer
+          example: 20
+        offset:
+          type: integer
+          example: 0
+
+    SummaryItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [daily, appointment, prep]
+          example: "daily"
+        date:
+          type: string
+          format: date
+          example: "2025-01-15"
+        call_id:
+          type: string
+          example: "call_12345"
+        content:
+          type: string
+          example: "Today's Performance Summary..."
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T18:00:00Z"
+
+    CallSummaryResponse:
+      type: object
+      properties:
+        call_id:
+          type: string
+          example: "call_12345"
+        rep_id:
+          type: string
+          example: "rep_12345"
+        summary_type:
+          type: string
+          example: "appointment"
+        content:
+          type: string
+          example: "Appointment Summary:\n\nCustomer: John Smith (ABC Corp)..."
+        key_points:
+          type: array
+          items:
+            type: string
+          example: ["Qualified lead with budget confirmed", "Technical demo scheduled"]
+        next_steps:
+          type: array
+          items:
+            type: string
+          example: ["Send detailed proposal", "Schedule technical demo"]
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+
+    # Performance & Analytics Schemas
+    PerformanceMetricsResponse:
+      type: object
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        total_calls:
+          type: integer
+          example: 150
+        conversion_rate:
+          type: number
+          format: float
+          example: 0.25
+        average_call_duration:
+          type: number
+          format: float
+          example: 18.5
+        lead_quality_score:
+          type: number
+          format: float
+          example: 0.78
+        objection_rate:
+          type: number
+          format: float
+          example: 0.35
+
+    RepPerformanceResponse:
+      type: object
+      properties:
+        reps:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepPerformance'
+
+    RepPerformance:
+      type: object
+      properties:
+        rep_id:
+          type: string
+          example: "rep_12345"
+        name:
+          type: string
+          example: "Sarah Johnson"
+        performance_score:
+          type: number
+          format: float
+          example: 0.85
+        calls_handled:
+          type: integer
+          example: 45
+        conversion_rate:
+          type: number
+          format: float
+          example: 0.31
+        coaching_recommendations:
+          type: array
+          items:
+            type: string
+          example: ["Improve objection handling", "Focus on qualification questions"]
+
+    ObjectionAnalyticsResponse:
+      type: object
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        objection_frequency:
+          type: object
+          properties:
+            price:
+              type: integer
+              example: 45
+            timing:
+              type: integer
+              example: 30
+            authority:
+              type: integer
+              example: 25
+        objection_impact:
+          type: object
+          properties:
+            price:
+              type: number
+              format: float
+              example: 0.65
+            timing:
+              type: number
+              format: float
+              example: 0.45
+            authority:
+              type: number
+              format: float
+              example: 0.35
+        top_objections:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopObjection'
+
+    TopObjection:
+      type: object
+      properties:
+        objection_type:
+          type: string
+          example: "price"
+        frequency:
+          type: integer
+          example: 45
+        impact_score:
+          type: number
+          format: float
+          example: 0.65
+
+    LeadAnalyticsResponse:
+      type: object
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        lead_quality_distribution:
+          type: object
+          properties:
+            hot:
+              type: integer
+              example: 25
+            warm:
+              type: integer
+              example: 45
+            cold:
+              type: integer
+              example: 30
+        lead_sources:
+          type: object
+          properties:
+            website:
+              type: integer
+              example: 40
+            referral:
+              type: integer
+              example: 30
+            cold_call:
+              type: integer
+              example: 20
+            social:
+              type: integer
+              example: 10
+        average_lead_score:
+          type: number
+          format: float
+          example: 0.72
+
+    # Webhook Schemas
+    CallRailWebhookRequest:
+      type: object
+      required:
+        - event
+        - timestamp
+        - data
+      properties:
+        event:
+          type: string
+          example: "call.completed"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:30:00Z"
+        data:
+          type: object
+          properties:
+            call_id:
+              type: string
+              example: "call_12345"
+            company_id:
+              type: string
+              format: uuid
+              example: "550e8400-e29b-41d4-a716-446655440000"
+            audio_url:
+              type: string
+              format: uri
+              example: "https://s3.amazonaws.com/callrail/audio.wav"
+            duration:
+              type: integer
+              example: 300
+            caller_phone:
+              type: string
+              example: "+1234567890"
+            recording_url:
+              type: string
+              format: uri
+              example: "https://s3.amazonaws.com/callrail/recording.wav"
+
+    WebhookResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "processed"
+        processing_id:
+          type: string
+          example: "proc_12345"
