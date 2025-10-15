@@ -119,27 +119,7 @@ This section provides access to all comprehensive documentation files for the Ot
 | [Authentication](./comprehensive_authentication_doc.md) | ✅ Complete | 100% | Oct 15, 2025 |
 | [Requirements Response](./comprehensive-requirements-response.md) | ✅ Complete | 98% | Oct 15, 2025 |
 
-## 🔗 Related Documentation
 
-### Additional Resources
-- [Database Schema Documentation](./database-schema-documentation.md) - Database design and relationships
-- [Authentication Setup](./authentication-setup.md) - Clerk integration setup guide
-- [Authentication API](./authentication-api.md) - Authentication endpoint specifications
-- [API Descriptions](./api-descriptions.md) - High-level API overview
-- [Integration Checklist](./integration-checklist.md) - Development integration checklist
-
-### Development Resources
-- [Week 1 Tasks](./week1-tasks.md) - Initial development tasks
-- [Requirements Gaps](./otto-requirments-gaps.md) - Identified requirements gaps
-- [Complete System Architecture](./complete-system-architecture.md) - Overall system design
-- [Tech Design](./otto-tech-design.md) - Technical implementation details
-
-## 📞 Support
-
-For questions about the documentation or implementation:
-- **Technical Issues**: Development Team
-- **Integration Support**: UWC Integration Partners  
-- **Business Requirements**: Product Management
 
 ---
 
