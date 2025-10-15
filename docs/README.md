@@ -76,6 +76,24 @@ This section provides access to all comprehensive documentation files for the Ot
 - UWC integration endpoints
 - Testing resource specifications
 
+### 🗄️ Database Schema
+
+#### [Comprehensive Database Schema](./comprehensive-db-schema.md)
+**Complete database schema with PostgreSQL + Milvus integration**
+
+- **Multi-tenant Architecture**: Company-based isolation with role-based access control
+- **PostgreSQL Tables**: Business entities, users, calls, documents, analytics, and audit trails
+- **Milvus Integration**: Vector storage and content for RAG operations
+- **UWC Integration**: Entity management and event sourcing
+- **Performance Optimization**: Indexing strategy and query optimization
+
+**Key Features:**
+- 19 core business tables with complete schemas
+- Milvus collection strategy for vector operations
+- RAG namespace partitioning by company/type/role
+- Data retention and archival policies
+- Security implementation with RLS and encryption
+
 ### 📧 Communication
 
 #### [Requirements Summary Email](./requirements-summary-email.md)
@@ -97,8 +115,9 @@ This section provides access to all comprehensive documentation files for the Ot
 
 ### For Developers
 1. **Start with**: [Comprehensive API Design](./comprehensive-api-design.md) for endpoint specifications
-2. **Authentication**: Review [Comprehensive Authentication Documentation](./comprehensive_authentication_doc.md) for security implementation
-3. **Testing**: Use [Comprehensive Requirements Response](./comprehensive-requirements-response.md) for performance targets and sample data
+2. **Database**: Review [Comprehensive Database Schema](./comprehensive-db-schema.md) for data model and relationships
+3. **Authentication**: Review [Comprehensive Authentication Documentation](./comprehensive_authentication_doc.md) for security implementation
+4. **Testing**: Use [Comprehensive Requirements Response](./comprehensive-requirements-response.md) for performance targets and sample data
 
 ### For Integration Partners
 1. **API Reference**: [Comprehensive API OpenAPI Specification](./comprehensive-api-openapi.yaml) for complete API documentation
@@ -118,11 +137,12 @@ This section provides access to all comprehensive documentation files for the Ot
 | [OpenAPI Spec](./comprehensive-api-openapi.yaml) | ✅ Complete | 100% | Oct 15, 2025 |
 | [Authentication](./comprehensive_authentication_doc.md) | ✅ Complete | 100% | Oct 15, 2025 |
 | [Requirements Response](./comprehensive-requirements-response.md) | ✅ Complete | 98% | Oct 15, 2025 |
+| [Database Schema](./comprehensive-db-schema.md) | ✅ Complete | 100% | Oct 15, 2025 |
 
 
 
 ---
 
-**Documentation Status**: 98% Complete  
+**Documentation Status**: 99% Complete  
 **Ready for Development**: ✅ Yes  
 **Last Updated**: October 15, 2025
