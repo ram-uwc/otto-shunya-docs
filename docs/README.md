@@ -64,14 +64,12 @@ This section provides access to all comprehensive documentation files for the Ot
 **Complete requirements documentation with performance SLAs and testing resources**
 
 - **Performance SLAs**: Latency targets, rate limits, timeouts, and availability for each endpoint category
-- **Rate Limiting**: Different limits for Admin (1000 req/min), Manager (500 req/min), CSR/Sales Rep (200 req/min)
-- **Data Processing Limits**: File size limits, duration limits, and concurrent job limits
+- **Rate Limiting**: for ASR details given for all APIS we can have autoscale to handle load
 - **Storage and Retention**: Data retention policies and storage limits
 - **Testing Resources**: Sample RAG queries with mock responses, webhook payloads
 
 **Key Features:**
 - Performance specifications table
-- Role-based rate limiting
 - Sample RAG queries and responses
 - UWC integration endpoints
 - Testing resource specifications
