@@ -109,6 +109,23 @@ This section provides access to all comprehensive documentation files for the Ot
 - UWC integration partners
 - Product management
 
+### Mock API Features
+- **50+ Endpoints**: Complete API coverage including calls, analytics, SOP, RAG, and more
+- **Role-Based Access**: Test different user permissions and access levels
+- **Realistic Data**: Generated mock data that mimics real business scenarios
+- **Interactive Testing**: Swagger UI for easy endpoint testing
+- **Token Management**: Dynamic token generation with 3600-minute expiration
+
+## 📖 API Documentation
+
+### Mock API
+
+
+- **Swagger UI**: http://otto.shunyalabs.ai/docs
+
+### Mock API (Testing)
+- **Swagger UI**: https://otto.shunyalabs.ai/docs - **Interactive testing with token generation**
+
 ## 🚀 Quick Start Guide
 
 ### For Developers
@@ -116,6 +133,7 @@ This section provides access to all comprehensive documentation files for the Ot
 2. **Database**: Review [Comprehensive Database Schema](./comprehensive-db-schema.md) for data model and relationships
 3. **Authentication**: Review [Comprehensive Authentication Documentation](./comprehensive_authentication_doc.md) for security implementation
 4. **Testing**: Use [Comprehensive Requirements Response](./comprehensive-requirements-response.md) for performance targets and sample data
+5. **Mock API Testing**: Use [Mock API Testing](./MOCK_API_TESTING_GUIDE.md)** - Complete guide with all endpoints, examples, and troubleshooting
 
 ### For Integration Partners
 1. **API Reference**: [Comprehensive API OpenAPI Specification](./comprehensive-api-openapi.yaml) for complete API documentation
@@ -123,9 +141,8 @@ This section provides access to all comprehensive documentation files for the Ot
 3. **Performance**: [Comprehensive Requirements Response](./comprehensive-requirements-response.md) for SLA targets
 
 ### For Stakeholders
-1. **Overview**: [Requirements Summary Email](./requirements-summary-email.md) for executive summary
-2. **Business Value**: [Comprehensive API Design](./comprehensive-api-design.md) for business outcomes mapping
-3. **Status**: [Comprehensive Requirements Response](./comprehensive-requirements-response.md) for completion status
+1. **Business Value**: [Comprehensive API Design](./comprehensive-api-design.md) for business outcomes mapping
+2. **Status**: [Comprehensive Requirements Response](./comprehensive-requirements-response.md) for completion status
 
 ## 📋 Documentation Status
 
