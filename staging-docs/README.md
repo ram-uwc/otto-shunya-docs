@@ -17,6 +17,7 @@ The Otto AI RAG (Retrieval-Augmented Generation) system is a comprehensive call 
 ### Database Schema (14 Tables)
 
 #### Call Analysis Tables
+- `sample call recording` -  https://otto-call-recording.s3.us-east-1.amazonaws.com/req_call_0001.mp3
 - `call_transcripts` - Audio transcription results with speaker diarization
 - `call_summaries` - AI-generated call summaries
 - `call_objections` - Detected objections with categorization
