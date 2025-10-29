@@ -76,7 +76,7 @@ The Otto AI RAG (Retrieval-Augmented Generation) system is a comprehensive call 
    ├─ Links stages to company_id and target_roles
    ├─ Updates progress: 100%
    └─ Marks document as "completed"
-
+```
 ## 🚀 Key Features
 
 ### 1. Call Transcription
