@@ -39,6 +39,44 @@ The Otto AI RAG (Retrieval-Augmented Generation) system is a comprehensive call 
 - `celery_taskmeta` - Celery result backend
 - `celery_tasksetmeta` - Celery task group management
 
+### Internal Flow - SOP Processing Pipeline
+
+```
+1. Upload Stage (API Layer)
+   ├─ User uploads PDF via API endpoint
+   ├─ File uploaded to S3 storage
+   ├─ Document record created in PostgreSQL
+   ├─ Celery task queued for processing
+   └─ Returns document_id and processing status
+
+2. Text Extraction Stage (Worker)
+   ├─ Celery worker picks up task
+   ├─ Extracts text from PDF using PyPDF2
+   ├─ Saves extracted text to S3
+   ├─ Updates progress: 30%
+   └─ Stores extracted text path in database
+
+3. SOP Extraction Stage (Worker)
+   ├─ Detects document_type = "sop"
+   ├─ Calls SOPExtractionService.process_sop_document()
+   ├─ Uses LLM to analyze document text
+   ├─ Extracts structured stages with:
+   │  ├─ Stage name
+   │  ├─ Comprehensive description
+   │  ├─ Stage order/sequence
+   │  ├─ Target roles
+   │  └─ Rules and guidelines
+   ├─ Updates progress: 60%
+   └─ Returns structured JSON with stages
+
+4. Storage Stage (Worker)
+   ├─ Parses LLM JSON response
+   ├─ Validates stage structure
+   ├─ Stores each stage in sop_stages table
+   ├─ Links stages to company_id and target_roles
+   ├─ Updates progress: 100%
+   └─ Marks document as "completed"
+
 ## 🚀 Key Features
 
 ### 1. Call Transcription
