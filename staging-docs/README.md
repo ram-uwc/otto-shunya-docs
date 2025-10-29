@@ -41,7 +41,7 @@ The Otto AI RAG (Retrieval-Augmented Generation) system is a comprehensive call 
 ## 🚀 Key Features
 
 ### 1. Call Transcription
-- **Audio Processing**: Whisper/Shunya ASR integration
+- **Audio Processing**: Shunya ASR integration
 - **Speaker Diarization**: Automatic speaker identification
 - **Status Tracking**: Real-time processing status
 
