@@ -370,30 +370,7 @@ def _extract_role_from_context(self, user_context: Optional[Dict[str, Any]] = No
 
 ### 3. Update all API methods to accept and pass target_role
 
-See examples in sections above.
 
----
-
-## Questions for Otto Backend Team
-
-1. **How is user role currently extracted in Otto Backend?**
-   - From JWT token?
-   - From database?
-   - From request context?
-
-2. **Are Personal Otto endpoints currently being called?**
-   - If yes, they will fail without the fix
-   - If no, this is a future-proofing fix
-
-3. **Are SOP management endpoints currently being called?**
-   - If yes, they will fail without the fix
-   - If no, this is a future-proofing fix
-
-4. **What is the expected behavior for multi-role users?**
-   - Should we use the primary role?
-   - Should we allow role switching?
-
----
 
 **Document Maintained By**: Shunya Team (ottoai-rag)  
 **Last Updated**: 2025-12-08  
