@@ -1,0 +1,80 @@
+{
+  "conversation_id": 12345,
+  "messages": [
+    {
+      "message_id": "msg_001",
+      "timestamp": "2025-01-15T10:00:00-07:00",
+      "sender": "customer",
+      "text": "Hi, I saw your ad online. Do you do roof repairs?"
+    },
+    {
+      "message_id": "msg_002",
+      "timestamp": "2025-01-15T10:01:00-07:00",
+      "sender": "rep",
+      "text": "Hi there! Yes, we do roof repairs and replacements. My name is Sarah. What kind of issue are you experiencing?"
+    },
+    {
+      "message_id": "msg_003",
+      "timestamp": "2025-01-15T10:02:00-07:00",
+      "sender": "customer",
+      "text": "I have a leak in my roof from the recent storm. Water is coming into my living room and I'm worried about damage."
+    },
+    {
+      "message_id": "msg_004",
+      "timestamp": "2025-01-15T10:03:00-07:00",
+      "sender": "rep",
+      "text": "I understand, that's urgent. We can send a roofing specialist out today to assess the damage. What's your address?"
+    },
+    {
+      "message_id": "msg_005",
+      "timestamp": "2025-01-15T10:04:00-07:00",
+      "sender": "customer",
+      "text": "1234 Main Street, Phoenix, Arizona 85001"
+    },
+    {
+      "message_id": "msg_006",
+      "timestamp": "2025-01-15T10:05:00-07:00",
+      "sender": "rep",
+      "text": "Perfect. We have availability at 2pm today or tomorrow morning at 9am. Which works better?"
+    },
+    {
+      "message_id": "msg_007",
+      "timestamp": "2025-01-15T10:06:00-07:00",
+      "sender": "customer",
+      "text": "How much will it cost? I'm on a fixed income."
+    },
+    {
+      "message_id": "msg_008",
+      "timestamp": "2025-01-15T10:07:00-07:00",
+      "sender": "rep",
+      "text": "The inspection is free. After we assess the damage, we'll provide a detailed quote. Most roof repairs range from $500-$2000 depending on the extent. We also offer financing options if needed."
+    },
+    {
+      "message_id": "msg_009",
+      "timestamp": "2025-01-15T10:08:00-07:00",
+      "sender": "customer",
+      "text": "That seems expensive. Can you do it cheaper?"
+    },
+    {
+      "message_id": "msg_010",
+      "timestamp": "2025-01-15T10:09:00-07:00",
+      "sender": "rep",
+      "text": "I understand your concern. We can discuss options when the specialist arrives. They can give you a detailed quote before any work begins. Would 2pm today work?"
+    },
+    {
+      "message_id": "msg_011",
+      "timestamp": "2025-01-15T10:10:00-07:00",
+      "sender": "customer",
+      "text": "Okay, let's do 2pm today. My name is John Smith and my phone number is 602-555-1234."
+    },
+    {
+      "message_id": "msg_012",
+      "timestamp": "2025-01-15T10:11:00-07:00",
+      "sender": "rep",
+      "text": "Perfect! I've scheduled you for today at 2pm. The roofing specialist will call 30 minutes before arrival. See you then!"
+    }
+  ],
+  "timezone": "America/Phoenix",
+  "conversation_started_at": "2025-01-15T10:00:00-07:00"
+}
+
