@@ -697,7 +697,7 @@ For API support or questions, contact: support@otto.shunyalabs.ai
 
 ## Changelog
 
-### 2025-01-15
+### 2025-12-15
 - ✅ Added `timezone` and `call_started_at` parameters to transcription API
 - ✅ Enhanced qualification response with appointment details, address, and rep_details
 - ✅ Added SMS/Text analysis endpoints
